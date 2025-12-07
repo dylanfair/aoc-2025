@@ -55,17 +55,9 @@ fn part_two(path: &str) {
                 timelines.insert(col, 1);
             }
             if char == '^' && timelines.contains_key(&col) {
-                let mut left = *timelines.get(&col).unwrap();
-                let mut right = *timelines.get(&col).unwrap();
-                if let Some(existing_l_timelines) = timelines.get(&(col - 1)) {
-                    left += existing_l_timelines;
-                }
-                if let Some(existing_r_timelines) = timelines.get(&(col + 1)) {
-                    right += existing_r_timelines;
-                }
-                timelines.insert(col - 1, left);
-                timelines.insert(col + 1, right);
-                timelines.remove(&col);
+                let count = timelines.remove(&col).unwrap();
+                *timelines.entry(col - 1).or_insert(0) += count;
+                *timelines.entry(col + 1).or_insert(0) += count;
             }
         }
     }
