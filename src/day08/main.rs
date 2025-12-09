@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::time::Instant;
 use std::{
     fs::File,
@@ -28,25 +29,81 @@ impl Box {
         }
     }
 
-    fn distance(self, other: &Box) -> f64 {
+    fn distance(&self, other: &Box) -> f64 {
         let adds =
             (self.x - other.x).pow(2) + (self.y - other.y).pow(2) + (self.z - other.z).pow(2);
         (adds as f64).sqrt()
     }
 }
 
-fn part_one(path: &str, connections: u32) {
+fn part_one(path: &str, connections: usize) {
     let file = File::open(path).unwrap();
     let lines = io::BufReader::new(file).lines();
 
     let mut boxes = vec![];
-    for line in lines {
+    let mut nodes: HashMap<usize, Vec<usize>> = HashMap::new();
+    for (index, line) in lines.enumerate() {
         let jbox = Box::from_string(line.unwrap());
         boxes.push(jbox);
+        nodes.insert(index, vec![]);
     }
 
-    for jbox in boxes {
-        println!("{:?}", jbox);
+    let mut distances = Vec::with_capacity(connections);
+    let mut current_max = 0.0;
+    for i in 0..boxes.len() {
+        let ibox = boxes.get(i).unwrap();
+        for j in 0..boxes.len() {
+            if i == j {
+                continue;
+            }
+            let jbox = boxes.get(j).unwrap();
+            let distance = ibox.distance(&jbox);
+
+            if distances.len() < connections {
+                distances.push((distance, (i, j)));
+                if distances.len() == connections {
+                    distances.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+                    current_max = distances.get(connections - 1).unwrap().0;
+                }
+                continue;
+            }
+
+            if distance >= current_max {
+                continue;
+            } else {
+                for x in 0..connections - 2 {
+                    let curr = distances.get(x).unwrap().0;
+                    let next = distances.get(x + 1).unwrap().0;
+
+                    if distance > curr && distance < next {
+                        let mut right_half = distances.split_off(x + 1);
+                        distances.push((distance, (i, j)));
+                        right_half.pop();
+                        distances.extend(right_half);
+                    }
+                }
+            }
+        }
+    }
+    // println!("{:?}", distances);
+    println!("Showing {} distances", distances.len());
+    let mut nodes = HashMap::new();
+    for (_, node_connection) in distances {
+        nodes
+            .entry(node_connection.0)
+            .or_insert(vec![])
+            .push(node_connection.1);
+        nodes
+            .entry(node_connection.1)
+            .or_insert(vec![])
+            .push(node_connection.0);
+    }
+    println!("{:?}", nodes);
+
+    // BFS time?
+    let mut visited = vec![];
+    for (node, to_visit) in nodes {
+        visited.push(node);
     }
 }
 
