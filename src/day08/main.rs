@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::time::Instant;
 use std::{
     fs::File,
@@ -101,10 +101,37 @@ fn part_one(path: &str, connections: usize) {
     println!("{:?}", nodes);
 
     // BFS time?
-    let mut visited = vec![];
-    for (node, to_visit) in nodes {
-        visited.push(node);
+    let mut total_visited = vec![];
+    let mut connection_sizes = vec![];
+    for (node, to_visit) in &nodes {
+        if total_visited.contains(&node) {
+            continue;
+        }
+        let mut queue = VecDeque::new();
+        let mut visited = vec![];
+        connection_sizes.push(bfs(
+            *node,
+            &nodes,
+            &mut queue,
+            &mut visited,
+            &mut total_visited,
+        ));
+        // for visit in to_visit {
+        //     queue.push_back(visit);
+        // }
     }
+}
+
+fn bfs(
+    node: usize,
+    nodes: &HashMap<usize, Vec<usize>>,
+    to_visit: &mut VecDeque<usize>,
+    local_visited: &mut Vec<usize>,
+    total_visited: &mut Vec<usize>,
+) -> usize {
+    local_visited.push(node);
+    total_visited.push(node);
+    return local_visited.len();
 }
 
 #[cfg(test)]
