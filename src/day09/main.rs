@@ -39,3 +39,25 @@ fn part_one(path: &str) {
     }
     println!("{max_area}");
 }
+
+fn is_point_inside(point: &(u64, u64), polygon: &Vec<((u64, u64), (u64, u64))>) -> bool {
+    if ray_cast(point, polygon).is_multiple_of(2) {
+        return false;
+    }
+    true
+}
+
+fn ray_cast(point: &(u64, u64), polygon: &Vec<((u64, u64), (u64, u64))>) -> u64 {
+    let mut count = 0;
+    const OFFSET: u64 = 100_000;
+    let point_segment = (point.0 + OFFSET, point.1);
+
+    for side in polygon {
+        // check if segment crosses
+        if cross {
+            count += 1;
+        }
+    }
+
+    return count;
+}
