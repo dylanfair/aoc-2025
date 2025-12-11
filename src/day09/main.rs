@@ -13,7 +13,7 @@ fn main() {
     println!("Part one time: {:?}", duration1);
 
     let start2 = Instant::now();
-    part_two("src/day09/real.txt");
+    part_two("src/day09/test.txt");
     let duration2 = start2.elapsed();
     println!("Part two time: {:?}", duration2);
 }
@@ -32,7 +32,7 @@ fn part_one(path: &str) {
 
     let mut max_area = 0;
     for i in 0..red_tiles.len() {
-        for j in i..red_tiles.len() {
+        for j in i + 1..red_tiles.len() {
             let red_tile_i = red_tiles.get(i).unwrap();
             let red_tile_j = red_tiles.get(j).unwrap();
 
@@ -73,7 +73,7 @@ fn part_two(path: &str) {
 
     let mut max_area = 0;
     for i in 0..red_tiles.len() {
-        for j in i..red_tiles.len() {
+        for j in i + 1..red_tiles.len() {
             let red_tile_i = red_tiles.get(i).unwrap();
             let red_tile_j = red_tiles.get(j).unwrap();
             let red_tile_x = (red_tile_i.0, red_tile_j.1);
@@ -97,6 +97,8 @@ fn part_two(path: &str) {
                 let width = red_tile_i.0.abs_diff(red_tile_j.0) + 1;
                 let area = height * width;
                 if area > max_area {
+                    println!("{:?} and {:?} are valid", red_tile_i, red_tile_j);
+                    println!("New max! {area}");
                     max_area = area;
                 }
             }
