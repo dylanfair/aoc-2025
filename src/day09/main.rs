@@ -83,7 +83,10 @@ fn part_two(path: &str) {
     let mut max_redtile_i = (0, 0);
     let mut max_redtile_j = (0, 0);
     for i in 0..red_tiles.len() {
-        for j in i + 1..red_tiles.len() {
+        for j in 0..red_tiles.len() {
+            if i == j {
+                continue;
+            }
             let red_tile_i = red_tiles.get(i).unwrap();
             let red_tile_j = red_tiles.get(j).unwrap();
             let red_tile_x = (red_tile_i.0, red_tile_j.1);
@@ -103,6 +106,7 @@ fn part_two(path: &str) {
                 && is_segment_inside(&segment3, &segments)
                 && is_segment_inside(&segment4, &segments)
             {
+                println!("{:?} and {:?} are valid", red_tile_i, red_tile_j);
                 let height = red_tile_i.1.abs_diff(red_tile_j.1) + 1;
                 let width = red_tile_i.0.abs_diff(red_tile_j.0) + 1;
                 let area = height * width;
@@ -137,7 +141,6 @@ fn part_two(path: &str) {
         }
     }
     println!("{max_area}");
-    println!("{max_area}");
     println!("tile i: {:?}", max_redtile_i);
     println!("tile j: {:?}", max_redtile_j);
     let red_tile_x = (max_redtile_i.0, max_redtile_j.1);
@@ -164,6 +167,17 @@ fn is_point_inside(point: &(i64, i64), polygon: &LineSegment) -> bool {
 
 fn is_segment_inside(segment: &((i64, i64), (i64, i64)), polygon: &LineSegment) -> bool {
     for side in polygon {
+        // check for collinear
+        let v1_x = segment.1.0 - segment.0.0;
+        let v1_y = segment.1.1 - segment.0.1;
+        let v2_x = side.1.0 - side.0.0;
+        let v2_y = side.1.1 - side.0.1;
+
+        let cross_product_scalar = v1_x * v2_y - v1_y * v2_x;
+        if cross_product_scalar == 0 {
+            continue;
+        }
+
         // check if segment crosses
         if intercept(&segment.0, &segment.1, &side.0, &side.1) {
             return false;
